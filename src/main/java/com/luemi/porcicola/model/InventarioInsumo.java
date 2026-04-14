@@ -25,7 +25,7 @@ public class InventarioInsumo {
 
     @Enumerated(EnumType.STRING)
     @JdbcTypeCode(SqlTypes.NAMED_ENUM)
-    @Column(name = "unidad_insumo", nullable = false)
+    @Column(name = "unidad", nullable = false)
     private UnidadInsumo unidad;
 
     @Column(name = "consumo_diario_estimado")
