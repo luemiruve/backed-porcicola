@@ -41,7 +41,7 @@ public class CicloReproductivo {
 
     @Enumerated(EnumType.STRING)
     @JdbcTypeCode(SqlTypes.NAMED_ENUM)
-    @Column(name = "estado_ciclo")
+    @Column(name = "estado")
     private EstadoCiclo estado = EstadoCiclo.Gestacion;
 
     @ManyToOne
