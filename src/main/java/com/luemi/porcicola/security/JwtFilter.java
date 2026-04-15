@@ -40,6 +40,7 @@ public class JwtFilter extends OncePerRequestFilter {
 
         if (!jwtUtil.isTokenValid(token)) {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.getWriter().write("Token inválido o expirado");
             return;
         }
 
