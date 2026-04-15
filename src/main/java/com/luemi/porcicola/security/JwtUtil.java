@@ -1,6 +1,8 @@
 package com.luemi.porcicola.security;
 
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
@@ -45,6 +47,18 @@ public class JwtUtil {
     public Integer extractIdGranja(String token) {
         return getClaims(token).get("idGranja", Integer.class);
     }
+
+    public boolean isTokenValid(String token) {
+        try {
+            getClaims(token);
+            return true;
+        } catch (ExpiredJwtException e) {
+            return false;
+        } catch (JwtException e) {
+            return false;
+        }
+    }
+
     private Claims getClaims(String token) {
         return Jwts.parser()
                 .verifyWith(getKey())
