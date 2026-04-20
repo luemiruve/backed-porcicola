@@ -16,7 +16,7 @@ public class AuthController {
     @Autowired
     private AuthService authService;
 
-    @PostMapping("/resgistro")
+    @PostMapping("/registro")
     public ResponseEntity<AuthResponse> registro(@RequestBody RegistroRequest request) {
 
         return ResponseEntity.ok(authService.registro(request));

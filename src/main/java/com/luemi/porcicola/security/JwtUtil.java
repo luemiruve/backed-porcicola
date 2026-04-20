@@ -27,24 +27,27 @@ public class JwtUtil {
 
     public String generateToken(String email, String rol, Integer idGranja) {
         return Jwts.builder()
-                .setSubject(email)
+                .subject(email)
                 .claim("rol", rol)
                 .claim("idGranja", idGranja)
-                .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + expiration))
+                .issuedAt(new Date())
+                .expiration(new Date(System.currentTimeMillis() + expiration))
                 .signWith(getKey())
                 .compact();
     }
 
     public String extractEmail(String token) {
+
         return getClaims(token).getSubject();
     }
 
     public String extractRol(String token) {
+
         return getClaims(token).get("rol", String.class);
     }
 
     public Integer extractIdGranja(String token) {
+
         return getClaims(token).get("idGranja", Integer.class);
     }
 

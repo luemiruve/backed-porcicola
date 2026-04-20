@@ -9,7 +9,6 @@ import com.luemi.porcicola.model.Usuario;
 import com.luemi.porcicola.repository.GranjaRepository;
 import com.luemi.porcicola.repository.UsuarioRepository;
 import com.luemi.porcicola.security.JwtUtil;
-import org.aspectj.lang.reflect.UnlockSignature;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -53,7 +52,7 @@ public class AuthService {
         usuario.setPasswordHash(passwordEncoder.encode(request.getPassword()));
         usuario.setTelefono(request.getTelefono());
         usuario.setGranja(granja);
-        usuario.setRol(RolUsuario.ADMIN); //asignacion del enum correcto
+        usuario.setRol(RolUsuario.valueOf("ADMIN")); //asignacion del enum correcto
         usuarioRepository.save(usuario);
 
         //Generar token
