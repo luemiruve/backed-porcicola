@@ -34,3 +34,5 @@ build/
 
 # Secretos Locales
 .env
+
+.DS_Store
