@@ -1,5 +1,6 @@
 package com.luemi.porcicola.controller;
 
+import com.luemi.porcicola.dto.ApiResponse;
 import com.luemi.porcicola.dto.AuthRequest;
 import com.luemi.porcicola.dto.AuthResponse;
 import com.luemi.porcicola.dto.RegistroRequest;
@@ -17,13 +18,12 @@ public class AuthController {
     private AuthService authService;
 
     @PostMapping("/registro")
-    public ResponseEntity<AuthResponse> registro(@RequestBody RegistroRequest request) {
-
-        return ResponseEntity.ok(authService.registro(request));
+    public ResponseEntity<ApiResponse<AuthResponse>> registro(@RequestBody RegistroRequest request) {
+        return ResponseEntity.ok(new ApiResponse<>(authService.registro(request)));
     }
 
     @PostMapping("/login")
-    public ResponseEntity<AuthResponse> login(@RequestBody AuthRequest request) {
-        return ResponseEntity.ok(authService.login(request));
+    public ResponseEntity<ApiResponse<AuthResponse>> login(@RequestBody AuthRequest request) {
+        return ResponseEntity.ok(new ApiResponse<>(authService.login(request)));
     }
 }
