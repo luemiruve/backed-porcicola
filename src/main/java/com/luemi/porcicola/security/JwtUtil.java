@@ -21,15 +21,15 @@ public class JwtUtil {
     @Value("${jwt.expiration}")
     private long expiration;
 
-    private SecretKey getKey(){
+    private SecretKey getKey() {
         return Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
     }
 
-    public String generateToken(String email, String rol, Integer idGranja) {
+    public String generateToken(String email, String role, Integer farmId) {
         return Jwts.builder()
                 .subject(email)
-                .claim("rol", rol)
-                .claim("idGranja", idGranja)
+                .claim("role", role)
+                .claim("farmId", farmId)
                 .issuedAt(new Date())
                 .expiration(new Date(System.currentTimeMillis() + expiration))
                 .signWith(getKey())
@@ -37,33 +37,28 @@ public class JwtUtil {
     }
 
     public String extractEmail(String token) {
-
         return getClaims(token).getSubject();
     }
 
-    public String extractRol(String token) {
-
-        return getClaims(token).get("rol", String.class);
+    public String extractRole(String token) {
+        return getClaims(token).get("role", String.class);
     }
 
-    public Integer extractIdGranja(String token) {
-
-        return getClaims(token).get("idGranja", Integer.class);
+    public Integer extractFarmId(String token) {
+        return getClaims(token).get("farmId", Integer.class);
     }
 
     public boolean isTokenValid(String token) {
         try {
             getClaims(token);
             return true;
-
         } catch (ExpiredJwtException e) {
-            System.out.println("Token expirado: " + e.getMessage());
+            System.out.println("Token expired: " + e.getMessage());
         } catch (JwtException e) {
-            System.out.println("Token inválido: " + e.getMessage());
+            System.out.println("Invalid token: " + e.getMessage());
         } catch (Exception e) {
-            System.out.println("Error inesperado al validar token: " + e.getMessage());
+            System.out.println("Unexpected error validating token: " + e.getMessage());
         }
-
         return false;
     }
 
