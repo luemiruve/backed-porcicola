@@ -36,3 +36,6 @@ build/
 .env
 
 .DS_Store
+
+echo ".agents/" >> .gitignore
+echo "skills-lock.json" >> .gitignore
