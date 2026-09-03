@@ -2,24 +2,24 @@ package com.luemi.porcicola.dto;
 
 public class AuthResponse {
     private String token;
-    private String role;
-    private Integer farmId;
+    private String rol;
+    private Integer idGranja;
 
-    public AuthResponse(String token, String role, Integer farmId) {
+    public AuthResponse (String token, String rol, Integer idGranja){
         this.token = token;
-        this.role = role;
-        this.farmId = farmId;
+        this.rol = rol;
+        this.idGranja = idGranja;
     }
 
     public String getToken() {
         return token;
     }
 
-    public String getRole() {
-        return role;
+    public String getRol() {
+        return rol;
     }
 
-    public Integer getFarmId() {
-        return farmId;
+    public Integer getIdGranja() {
+        return idGranja;
     }
 }
