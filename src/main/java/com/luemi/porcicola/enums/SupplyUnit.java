@@ -1,8 +1,8 @@
 package com.luemi.porcicola.enums;
 
-public enum UnidadInsumo {
+public enum SupplyUnit {
     ml,
     kg,
-    bulto
+    bag
 }
 

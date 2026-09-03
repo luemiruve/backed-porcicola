@@ -1,9 +1,8 @@
 package com.luemi.porcicola.security;
 
-import com.luemi.porcicola.model.Usuario;
-import com.luemi.porcicola.repository.UsuarioRepository;
+import com.luemi.porcicola.model.User;
+import com.luemi.porcicola.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -13,18 +12,17 @@ import org.springframework.stereotype.Service;
 public class CustomUserDetailsService implements UserDetailsService {
 
     @Autowired
-    private UsuarioRepository usuarioRepository;
+    private UserRepository userRepository;
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        Usuario usuario = usuarioRepository.findByEmail(email)
-                .orElseThrow(() -> new UsernameNotFoundException("Usuario no encontrado: " + email));
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found: " + email));
 
-        return User.builder()
-                .username(usuario.getEmail())
-                .password(usuario.getPasswordHash())
-                // Usamos .name() para convertir tu Enum RolUsuario a String
-                .roles(usuario.getRol().name())
+        return org.springframework.security.core.userdetails.User.builder()
+                .username(user.getEmail())
+                .password(user.getPasswordHash())
+                .roles(user.getRole().name())
                 .build();
     }
 }
