@@ -1,17 +1,25 @@
-package com.luemi.porcicola.dto;
+package com.luemi.porcicola.model;
 
-import jakarta.validation.constraints.NotBlank;
+import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
 
-// dto/GranjaDTO.java
-public class GranjaDTO {
+@Entity
+@Table(name = "granjas")
+public class Granja {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id_granja")
     private Integer idGranja;
-    private String nombre;
-    private String ubicacion;
-    private LocalDateTime fechaCreacion;
 
-    // getters y setters
+    @Column(nullable = false, length = 100)
+    private String nombre;
+
+    @Column(columnDefinition = "TEXT")
+    private String ubicacion;
+
+    @Column(name = "fecha_creacion", updatable = false)
+    private LocalDateTime fechaCreacion;
 
     public Integer getIdGranja() {
         return idGranja;
@@ -44,4 +52,11 @@ public class GranjaDTO {
     public void setFechaCreacion(LocalDateTime fechaCreacion) {
         this.fechaCreacion = fechaCreacion;
     }
+
+    @PrePersist
+    protected void onCreate() {
+        this.fechaCreacion = LocalDateTime.now();
+    }
 }
+
+

@@ -1,6 +1,6 @@
 package com.luemi.porcicola.enums;
 
-public enum UserRole {
+public enum RolUsuario {
     ADMIN,
-    WORKER
+    TRABAJADOR
 }
