@@ -77,11 +77,20 @@ public class ReproductiveCycleService {
     public ReproductiveCycleDTO update(Integer id, ReproductiveCycleDTO dto) {
         ReproductiveCycle existing = getOwnedCycle(id);
 
-        ReproductiveCycle cycle = reproductiveCycleMapper.toEntity(dto, existing.getSow(), existing.getFarm());
-        cycle.setId(existing.getId());
-        cycle.setFarrowingNumber(existing.getFarrowingNumber());
+        if (dto.getStartDate() != null) {
+            existing.setStartDate(dto.getStartDate());
+        }
+        if (dto.getExpectedFarrowingDate() != null) {
+            existing.setExpectedFarrowingDate(dto.getExpectedFarrowingDate());
+        }
+        if (dto.getActualFarrowingDate() != null) {
+            existing.setActualFarrowingDate(dto.getActualFarrowingDate());
+        }
+        if (dto.getStatus() != null) {
+            existing.setStatus(dto.getStatus());
+        }
 
-        return reproductiveCycleMapper.toDTO(reproductiveCycleRepository.save(cycle));
+        return reproductiveCycleMapper.toDTO(reproductiveCycleRepository.save(existing));
     }
 
     @Transactional

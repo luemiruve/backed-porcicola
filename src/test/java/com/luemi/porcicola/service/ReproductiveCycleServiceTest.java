@@ -289,6 +289,32 @@ class ReproductiveCycleServiceTest {
     }
 
     @Test
+    void update_withOmittedFields_preservesExistingValues() {
+        Animal sow = sow(5, farmA);
+        ReproductiveCycle existing = new ReproductiveCycle();
+        existing.setId(10);
+        existing.setSow(sow);
+        existing.setFarrowingNumber(1);
+        existing.setFarm(farmA);
+        existing.setStatus(CycleStatus.LACTATION);
+        existing.setStartDate(java.time.LocalDate.of(2026, 1, 1));
+        existing.setExpectedFarrowingDate(java.time.LocalDate.of(2026, 4, 25));
+
+        ReproductiveCycleDTO dto = new ReproductiveCycleDTO();
+        dto.setActualFarrowingDate(java.time.LocalDate.of(2026, 4, 24));
+
+        when(reproductiveCycleRepository.findById(10)).thenReturn(Optional.of(existing));
+        when(reproductiveCycleRepository.save(any(ReproductiveCycle.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        ReproductiveCycleDTO result = reproductiveCycleService.update(10, dto);
+
+        assertThat(result.getStatus()).isEqualTo(CycleStatus.LACTATION);
+        assertThat(result.getStartDate()).isEqualTo(java.time.LocalDate.of(2026, 1, 1));
+        assertThat(result.getExpectedFarrowingDate()).isEqualTo(java.time.LocalDate.of(2026, 4, 25));
+        assertThat(result.getActualFarrowingDate()).isEqualTo(java.time.LocalDate.of(2026, 4, 24));
+    }
+
+    @Test
     void update_allowsAnyStatusTransitionWithoutValidation() {
         ReproductiveCycle existing = new ReproductiveCycle();
         existing.setId(10);
