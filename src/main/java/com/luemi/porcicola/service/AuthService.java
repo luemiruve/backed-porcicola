@@ -2,12 +2,12 @@ package com.luemi.porcicola.service;
 
 import com.luemi.porcicola.dto.AuthRequest;
 import com.luemi.porcicola.dto.AuthResponse;
-import com.luemi.porcicola.dto.RegistroRequest;
-import com.luemi.porcicola.enums.RolUsuario;
-import com.luemi.porcicola.model.Granja;
-import com.luemi.porcicola.model.Usuario;
-import com.luemi.porcicola.repository.GranjaRepository;
-import com.luemi.porcicola.repository.UsuarioRepository;
+import com.luemi.porcicola.dto.RegisterRequest;
+import com.luemi.porcicola.enums.UserRole;
+import com.luemi.porcicola.model.Farm;
+import com.luemi.porcicola.model.User;
+import com.luemi.porcicola.repository.FarmRepository;
+import com.luemi.porcicola.repository.UserRepository;
 import com.luemi.porcicola.security.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -19,10 +19,10 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class AuthService {
     @Autowired
-    private UsuarioRepository usuarioRepository;
+    private UserRepository userRepository;
 
     @Autowired
-    private GranjaRepository granjaRepository;
+    private FarmRepository farmRepository;
 
     @Autowired
     private PasswordEncoder passwordEncoder;
@@ -34,39 +34,38 @@ public class AuthService {
     private JwtUtil jwtUtil;
 
     @Transactional
-    public AuthResponse registro(RegistroRequest request){
-        if (usuarioRepository.existsByEmail(request.getEmail())) {
-            throw new RuntimeException("El email ya está registrado");
+    public AuthResponse register(RegisterRequest request) {
+        if (userRepository.existsByEmail(request.getEmail())) {
+            throw new RuntimeException("Email is already registered");
         }
 
-        //Crear primero la granja por que el usuario necesita una referencia a la granja
-        Granja granja = new Granja();
-        granja.setNombre(request.getNombreGranja());
-        granja.setUbicacion(request.getUbicacionGranja());
-        granja = granjaRepository.save(granja);
+        // Create farm first because user needs a reference to it
+        Farm farm = new Farm();
+        farm.setName(request.getFarmName());
+        farm.setLocation(request.getFarmLocation());
+        farm = farmRepository.save(farm);
 
-        //Crear el Usuario Administrador
-        Usuario usuario = new Usuario();
-        usuario.setNombre(request.getNombre());
-        usuario.setEmail(request.getEmail());
-        usuario.setPasswordHash(passwordEncoder.encode(request.getPassword()));
-        usuario.setTelefono(request.getTelefono());
-        usuario.setGranja(granja);
-        usuario.setRol(RolUsuario.valueOf("ADMIN")); //asignacion del enum correcto
-        usuarioRepository.save(usuario);
+        // Create admin user
+        User user = new User();
+        user.setName(request.getName());
+        user.setEmail(request.getEmail());
+        user.setPasswordHash(passwordEncoder.encode(request.getPassword()));
+        user.setPhone(request.getPhone());
+        user.setFarm(farm);
+        user.setRole(UserRole.ADMIN);
+        userRepository.save(user);
 
-        //Generar token
+        // Generate token
         String token = jwtUtil.generateToken(
-                usuario.getEmail(),
-                usuario.getRol().name(), // Convertir el enum a String para el token
-                granja.getIdGranja());
+                user.getEmail(),
+                user.getRole().name(),
+                farm.getId());
 
-                return new AuthResponse(token, usuario.getRol().name(), granja.getIdGranja());
-
+        return new AuthResponse(token, user.getRole().name(), farm.getId());
     }
 
     public AuthResponse login(AuthRequest request) {
-        //valida credenciales si esta mal lanza un error automatico
+        // Authenticate credentials
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
                         request.getEmail(),
@@ -74,18 +73,16 @@ public class AuthService {
                 )
         );
 
-
-        Usuario usuario = usuarioRepository.findByEmail(request.getEmail())
-                .orElseThrow(() -> new RuntimeException("Usuario no encontrado: " + request.getEmail()));
-
+        User user = userRepository.findByEmail(request.getEmail())
+                .orElseThrow(() -> new RuntimeException("User not found: " + request.getEmail()));
 
         String token = jwtUtil.generateToken(
-                usuario.getEmail(),
-                usuario.getRol().name(),
-                usuario.getGranja().getIdGranja()
+                user.getEmail(),
+                user.getRole().name(),
+                user.getFarm().getId()
         );
 
-        return new AuthResponse(token, usuario.getRol().name(), usuario.getGranja().getIdGranja());
+        return new AuthResponse(token, user.getRole().name(), user.getFarm().getId());
     }
 
 }

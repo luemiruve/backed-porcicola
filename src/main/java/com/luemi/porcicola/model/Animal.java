@@ -1,62 +1,62 @@
 package com.luemi.porcicola.model;
 
-import com.luemi.porcicola.enums.EstadoAnimal;
-import com.luemi.porcicola.enums.TipoAnimal;
+import com.luemi.porcicola.enums.AnimalStatus;
+import com.luemi.porcicola.enums.AnimalType;
 import jakarta.persistence.*;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
-
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
 @Entity
-@Table(name = "animales")
+@Table(name = "animals")
 public class Animal {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id_animal")
-    private Integer idAnimal;
+    @Column(name = "id")
+    private Integer id;
 
     @Column(name = "nfc_uid", unique = true, length = 100)
     private String nfcUid;
 
-    @Column(length = 50)
-    private String nombre;
+    @Column(name = "name", length = 50)
+    private String name;
 
     @Enumerated(EnumType.STRING)
     @JdbcTypeCode(SqlTypes.NAMED_ENUM)
-    @Column(name = "tipo", nullable = false)
-    private TipoAnimal tipo;
+    @Column(name = "type", nullable = false)
+    private AnimalType type;
 
-    @Column(name = "fecha_nacimiento")
-    private LocalDate fechaNacimiento;
+    @Column(name = "birth_date")
+    private LocalDate birthDate;
 
     @Enumerated(EnumType.STRING)
     @JdbcTypeCode(SqlTypes.NAMED_ENUM)
-    @Column(name = "estado")
-    private EstadoAnimal estado = EstadoAnimal.Activo;
+    @Column(name = "status")
+    private AnimalStatus status = AnimalStatus.ACTIVE;
 
     @ManyToOne
-    @JoinColumn(name = "id_madre")
-    private Animal madre;
+    @JoinColumn(name = "mother_id")
+    private Animal mother;
 
-    @Column(name = "peso_actual")
-    private BigDecimal pesoActual;
+    @Column(name = "current_weight")
+    private BigDecimal currentWeight;
 
-    private String notas;
+    @Column(name = "notes")
+    private String notes;
 
     @ManyToOne
-    @JoinColumn(name = "id_granja", nullable = false)
-    private Granja granja;
+    @JoinColumn(name = "farm_id", nullable = false)
+    private Farm farm;
 
-    public Integer getIdAnimal() {
-        return idAnimal;
+    public Integer getId() {
+        return id;
     }
 
-    public void setIdAnimal(Integer idAnimal) {
-        this.idAnimal = idAnimal;
+    public void setId(Integer id) {
+        this.id = id;
     }
 
     public String getNfcUid() {
@@ -67,68 +67,68 @@ public class Animal {
         this.nfcUid = nfcUid;
     }
 
-    public String getNombre() {
-        return nombre;
+    public String getName() {
+        return name;
     }
 
-    public void setNombre(String nombre) {
-        this.nombre = nombre;
+    public void setName(String name) {
+        this.name = name;
     }
 
-    public TipoAnimal getTipo() {
-        return tipo;
+    public AnimalType getType() {
+        return type;
     }
 
-    public void setTipo(TipoAnimal tipo) {
-        this.tipo = tipo;
+    public void setType(AnimalType type) {
+        this.type = type;
     }
 
-    public LocalDate getFechaNacimiento() {
-        return fechaNacimiento;
+    public LocalDate getBirthDate() {
+        return birthDate;
     }
 
-    public void setFechaNacimiento(LocalDate fechaNacimiento) {
-        this.fechaNacimiento = fechaNacimiento;
+    public void setBirthDate(LocalDate birthDate) {
+        this.birthDate = birthDate;
     }
 
-    public EstadoAnimal getEstado() {
-        return estado;
+    public AnimalStatus getStatus() {
+        return status;
     }
 
-    public void setEstado(EstadoAnimal estado) {
-        this.estado = estado;
+    public void setStatus(AnimalStatus status) {
+        this.status = status;
     }
 
-    public Animal getMadre() {
-        return madre;
+    public Animal getMother() {
+        return mother;
     }
 
-    public void setMadre(Animal madre) {
-        this.madre = madre;
+    public void setMother(Animal mother) {
+        this.mother = mother;
     }
 
-    public BigDecimal getPesoActual() {
-        return pesoActual;
+    public BigDecimal getCurrentWeight() {
+        return currentWeight;
     }
 
-    public void setPesoActual(BigDecimal pesoActual) {
-        this.pesoActual = pesoActual;
+    public void setCurrentWeight(BigDecimal currentWeight) {
+        this.currentWeight = currentWeight;
     }
 
-    public String getNotas() {
-        return notas;
+    public String getNotes() {
+        return notes;
     }
 
-    public void setNotas(String notas) {
-        this.notas = notas;
+    public void setNotes(String notes) {
+        this.notes = notes;
     }
 
-    public Granja getGranja() {
-        return granja;
+    public Farm getFarm() {
+        return farm;
     }
 
-    public void setGranja(Granja granja) {
-        this.granja = granja;
+    public void setFarm(Farm farm) {
+        this.farm = farm;
     }
 }
 
