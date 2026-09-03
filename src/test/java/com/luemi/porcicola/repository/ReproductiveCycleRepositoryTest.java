@@ -11,6 +11,7 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 
 import java.util.List;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -106,15 +107,26 @@ class ReproductiveCycleRepositoryTest {
     }
 
     @Test
-    void countBySowId_countsAllCyclesRegardlessOfStatus() {
+    void findFirstBySowIdOrderByFarrowingNumberDesc_returnsHighestFarrowingNumber() {
         Farm farm = createFarm();
         Animal sow = createSow(farm);
         createCycle(farm, sow, 1, CycleStatus.FINISHED);
         createCycle(farm, sow, 2, CycleStatus.GESTATION);
 
-        long count = reproductiveCycleRepository.countBySowId(sow.getId());
+        Optional<ReproductiveCycle> result = reproductiveCycleRepository.findFirstBySowIdOrderByFarrowingNumberDesc(sow.getId());
 
-        assertThat(count).isEqualTo(2);
+        assertThat(result).isPresent();
+        assertThat(result.get().getFarrowingNumber()).isEqualTo(2);
+    }
+
+    @Test
+    void findFirstBySowIdOrderByFarrowingNumberDesc_returnsEmpty_whenSowHasNoCycles() {
+        Farm farm = createFarm();
+        Animal sow = createSow(farm);
+
+        Optional<ReproductiveCycle> result = reproductiveCycleRepository.findFirstBySowIdOrderByFarrowingNumberDesc(sow.getId());
+
+        assertThat(result).isEmpty();
     }
 
     @Test

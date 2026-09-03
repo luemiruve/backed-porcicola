@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface ReproductiveCycleRepository extends JpaRepository<ReproductiveCycle, Integer> {
@@ -18,7 +19,7 @@ public interface ReproductiveCycleRepository extends JpaRepository<ReproductiveC
 
     List<ReproductiveCycle> findByFarmIdAndSowIdAndStatus(Integer farmId, Integer sowId, CycleStatus status);
 
-    long countBySowId(Integer sowId);
+    Optional<ReproductiveCycle> findFirstBySowIdOrderByFarrowingNumberDesc(Integer sowId);
 
     List<ReproductiveCycle> findBySowIdAndStatusIn(Integer sowId, List<CycleStatus> statuses);
 }

@@ -97,11 +97,15 @@ class ReproductiveCycleServiceTest {
         ReproductiveCycleDTO dto = new ReproductiveCycleDTO();
         dto.setSowId(5);
 
+        ReproductiveCycle previousCycle = new ReproductiveCycle();
+        previousCycle.setFarrowingNumber(1);
+
         when(farmRepository.findById(1)).thenReturn(Optional.of(farmA));
         when(animalRepository.findById(5)).thenReturn(Optional.of(sow));
         when(reproductiveCycleRepository.findBySowIdAndStatusIn(5, List.of(CycleStatus.GESTATION, CycleStatus.LACTATION)))
                 .thenReturn(List.of());
-        when(reproductiveCycleRepository.countBySowId(5)).thenReturn(1L);
+        when(reproductiveCycleRepository.findFirstBySowIdOrderByFarrowingNumberDesc(5))
+                .thenReturn(Optional.of(previousCycle));
         when(reproductiveCycleRepository.save(any(ReproductiveCycle.class))).thenAnswer(invocation -> {
             ReproductiveCycle saved = invocation.getArgument(0);
             saved.setId(100);
@@ -113,6 +117,37 @@ class ReproductiveCycleServiceTest {
         assertThat(result.getId()).isEqualTo(100);
         assertThat(result.getSowId()).isEqualTo(5);
         assertThat(result.getFarrowingNumber()).isEqualTo(2);
+    }
+
+    @Test
+    void create_firstCycleForSow_assignsFarrowingNumberOne() {
+        Animal sow = sow(5, farmA);
+        ReproductiveCycleDTO dto = new ReproductiveCycleDTO();
+        dto.setSowId(5);
+
+        when(farmRepository.findById(1)).thenReturn(Optional.of(farmA));
+        when(animalRepository.findById(5)).thenReturn(Optional.of(sow));
+        when(reproductiveCycleRepository.findBySowIdAndStatusIn(5, List.of(CycleStatus.GESTATION, CycleStatus.LACTATION)))
+                .thenReturn(List.of());
+        when(reproductiveCycleRepository.findFirstBySowIdOrderByFarrowingNumberDesc(5))
+                .thenReturn(Optional.empty());
+        when(reproductiveCycleRepository.save(any(ReproductiveCycle.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        ReproductiveCycleDTO result = reproductiveCycleService.create(dto);
+
+        assertThat(result.getFarrowingNumber()).isEqualTo(1);
+    }
+
+    @Test
+    void create_withNullSowId_throws() {
+        ReproductiveCycleDTO dto = new ReproductiveCycleDTO();
+        dto.setSowId(null);
+
+        when(farmRepository.findById(1)).thenReturn(Optional.of(farmA));
+
+        assertThatThrownBy(() -> reproductiveCycleService.create(dto))
+                .isInstanceOf(RuntimeException.class)
+                .hasMessage("Sow not found");
     }
 
     @Test

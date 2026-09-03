@@ -47,7 +47,10 @@ public class ReproductiveCycleService {
         }
 
         ReproductiveCycle cycle = reproductiveCycleMapper.toEntity(dto, sow, farm);
-        cycle.setFarrowingNumber((int) reproductiveCycleRepository.countBySowId(sow.getId()) + 1);
+        int nextFarrowingNumber = reproductiveCycleRepository.findFirstBySowIdOrderByFarrowingNumberDesc(sow.getId())
+                .map(previous -> previous.getFarrowingNumber() + 1)
+                .orElse(1);
+        cycle.setFarrowingNumber(nextFarrowingNumber);
 
         return reproductiveCycleMapper.toDTO(reproductiveCycleRepository.save(cycle));
     }
@@ -109,6 +112,9 @@ public class ReproductiveCycleService {
     }
 
     private Animal resolveSow(Integer sowId, Integer farmId) {
+        if (sowId == null) {
+            throw new RuntimeException("Sow not found");
+        }
         Animal sow = animalRepository.findById(sowId)
                 .orElseThrow(() -> new RuntimeException("Sow not found"));
         if (!sow.getFarm().getId().equals(farmId) || sow.getType() != AnimalType.SOW) {
