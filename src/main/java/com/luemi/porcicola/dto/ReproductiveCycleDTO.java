@@ -1,54 +1,17 @@
-package com.luemi.porcicola.model;
+package com.luemi.porcicola.dto;
 
 import com.luemi.porcicola.enums.CycleStatus;
-import jakarta.persistence.*;
-import org.hibernate.annotations.DynamicUpdate;
-import org.hibernate.annotations.JdbcTypeCode;
-import org.hibernate.type.SqlTypes;
 
 import java.time.LocalDate;
 
-@Entity
-@Table(name = "reproductive_cycles")
-@DynamicUpdate
-public class ReproductiveCycle {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
+public class ReproductiveCycleDTO {
     private Integer id;
-
-    @ManyToOne
-    @JoinColumn(name = "sow_id", nullable = false)
-    private Animal sow;
-
-    @Column(name = "farrowing_number", nullable = false)
+    private Integer sowId;
     private Integer farrowingNumber;
-
-    @Column(name = "start_date")
     private LocalDate startDate;
-
-    @PrePersist
-    protected void onCreate() {
-        if (this.startDate == null) {
-            this.startDate = LocalDate.now();
-        }
-    }
-
-    @Column(name = "expected_farrowing_date")
     private LocalDate expectedFarrowingDate;
-
-    @Column(name = "actual_farrowing_date")
     private LocalDate actualFarrowingDate;
-
-    @Enumerated(EnumType.STRING)
-    @JdbcTypeCode(SqlTypes.NAMED_ENUM)
-    @Column(name = "status")
-    private CycleStatus status = CycleStatus.GESTATION;
-
-    @ManyToOne
-    @JoinColumn(name = "farm_id", nullable = false)
-    private Farm farm;
+    private CycleStatus status;
 
     public Integer getId() {
         return id;
@@ -58,12 +21,12 @@ public class ReproductiveCycle {
         this.id = id;
     }
 
-    public Animal getSow() {
-        return sow;
+    public Integer getSowId() {
+        return sowId;
     }
 
-    public void setSow(Animal sow) {
-        this.sow = sow;
+    public void setSowId(Integer sowId) {
+        this.sowId = sowId;
     }
 
     public Integer getFarrowingNumber() {
@@ -105,13 +68,4 @@ public class ReproductiveCycle {
     public void setStatus(CycleStatus status) {
         this.status = status;
     }
-
-    public Farm getFarm() {
-        return farm;
-    }
-
-    public void setFarm(Farm farm) {
-        this.farm = farm;
-    }
 }
-
