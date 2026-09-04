@@ -1,12 +1,11 @@
-# 🐷 Sistema Porcícola
+# 🐷 Porcicola Backend
 
-Backend para gestión integral de una granja porcina: ciclo reproductivo, inventario, sanidad animal y notificaciones automáticas. Multi-tenant por granja (`farm_id`), con control de acceso por rol.
+API REST para gestión integral de una granja porcina. Repositorio de lógica del proyecto **Porcicola** — junto a `porcicola-database` (esquema y Postgres local) y `porcicola-frontend` (cliente móvil), como repos independientes dentro del mismo proyecto.
 
 ## 🚀 Stack
 - Java 21 + Spring Boot 3.5
-- PostgreSQL (Supabase) · JPA / Hibernate (`ddl-auto=validate` — la BD es la fuente de verdad del esquema)
+- PostgreSQL (Supabase en prod, Docker local en dev — ver el repo `porcicola-database`) · JPA / Hibernate (`ddl-auto=validate` — la BD es la fuente de verdad del esquema)
 - JWT stateless (jjwt) + Spring Security (`@PreAuthorize` por rol)
-- Próximo: App Android (Kotlin) · Futuro: App iOS (Swift)
 
 ## 🧠 Arquitectura
 - REST API en capas: `Controller` → `Service` → `Repository` → `Model`, con `DTO` + `Mapper` por recurso
@@ -19,30 +18,18 @@ Backend para gestión integral de una granja porcina: ciclo reproductivo, invent
 - **Usuarios**: gestión por granja, roles `ADMIN`/`WORKER` (`UserController`)
 - **Animales**: CRUD + filtros por tipo/estado, aislamiento por granja, validación de madre, control por rol (`AnimalController`)
 
-## 🗺️ Roadmap backend
-- ✅ Fase 1 — Enums y modelos JPA
-- ✅ Fase 2 — Autenticación JWT
-- ✅ Fase 3 — Granjas y usuarios
-- 🚧 Fase 4 — Núcleo reproductivo
-  - ✅ `AnimalController` (incremento 1/4)
-  - 🔜 `ReproductiveCycleController`, `MatingController`, `LitterController`
-- 🔜 Fase 5 — Inventario y sanidad
-- 🔜 Fase 6 — Notificaciones, `GlobalExceptionHandler`, `CorsConfig`, `JacksonConfig`
-
 ## 🔐 Seguridad
 - JWT stateless, sin sesiones en servidor
 - Cada endpoint valida el `farm_id` del usuario autenticado contra el recurso solicitado — un recurso de otra granja responde igual que uno inexistente
 - Roles: `ADMIN` (CRUD completo) / `WORKER` (lectura + creación, sin editar/eliminar)
 - Contraseñas con `BCryptPasswordEncoder`
 
-## 🔧 Base de datos
-Triggers en PostgreSQL para lógica crítica independiente del cliente:
-- Fecha de parto automática (+114 días desde la monta)
-- Alertas de parto, destete y vacunas
-- Control de inventario (stock bajo)
-- Validación de correspondencia madre/ciclo/camada
-- Auditoría de cambios
+## ▶️ Correr localmente
+Contra Postgres en Docker (repo `porcicola-database`, clonado junto a este):
+```bash
+cd ../porcicola-database && docker compose up -d
+cd ../porcicola-backend && mvn spring-boot:run -Dspring-boot.run.profiles=local
+```
+Asume `porcicola-database` clonado como carpeta hermana de esta (`../porcicola-database`) — ajusta la ruta si tu checkout local es distinto. El perfil `local` (`src/main/resources/application-local.properties`) trae credenciales de dev fijas, sin depender de `.env`.
 
-## 📱 Futuro
-- App Android (Kotlin, MVVM + Retrofit)
-- App iOS (Swift)
+Contra Supabase (prod): requiere `.env` en esta carpeta con `DB_URL`, `DB_USERNAME`, `DB_PASSWORD`, `JWT_SECRET`, `JWT_EXPIRATION`, `SSUName`, `SSUPassword` — `mvn spring-boot:run` (sin profile).
