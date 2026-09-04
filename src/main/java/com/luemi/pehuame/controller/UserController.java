@@ -8,6 +8,7 @@ import com.luemi.pehuame.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -19,18 +20,21 @@ public class UserController {
     private UserService userService;
 
     // List users by farm
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/farms/{farmId}/users")
     public ResponseEntity<ApiResponse<List<UserDTO>>> listByFarm(@PathVariable Integer farmId) {
         return ResponseEntity.ok(new ApiResponse<>(userService.listByFarm(farmId)));
     }
 
     // Get user by id
+    @PreAuthorize("hasAnyRole('ADMIN','WORKER')")
     @GetMapping("/users/{id}")
     public ResponseEntity<ApiResponse<UserDTO>> getById(@PathVariable Integer id) {
         return ResponseEntity.ok(new ApiResponse<>(userService.getById(id)));
     }
 
     // Create worker in a farm
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/farms/{farmId}/users")
     public ResponseEntity<ApiResponse<UserDTO>> createWorker(
             @PathVariable Integer farmId,
@@ -40,6 +44,7 @@ public class UserController {
     }
 
     // Update user data
+    @PreAuthorize("hasAnyRole('ADMIN','WORKER')")
     @PutMapping("/users/{id}")
     public ResponseEntity<ApiResponse<UserDTO>> update(
             @PathVariable Integer id,
@@ -47,16 +52,18 @@ public class UserController {
         return ResponseEntity.ok(new ApiResponse<>(userService.update(id, dto)));
     }
 
-    // Change password
+    // Change password (self-service only, requires current password)
+    @PreAuthorize("hasAnyRole('ADMIN','WORKER')")
     @PostMapping("/users/{id}/change-password")
     public ResponseEntity<Void> changePassword(
             @PathVariable Integer id,
             @RequestBody ChangePasswordRequest request) {
-        userService.changePassword(id, request.getNewPassword());
+        userService.changePassword(id, request.getCurrentPassword(), request.getNewPassword());
         return ResponseEntity.noContent().build();
     }
 
     // Deactivate user
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/users/{id}/deactivate")
     public ResponseEntity<Void> deactivate(@PathVariable Integer id) {
         userService.deactivate(id);

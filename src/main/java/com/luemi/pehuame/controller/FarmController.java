@@ -6,6 +6,7 @@ import com.luemi.pehuame.model.Farm;
 import com.luemi.pehuame.service.FarmService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 // controller/FarmController.java
@@ -16,6 +17,7 @@ public class FarmController {
     @Autowired
     private FarmService farmService;
 
+    @PreAuthorize("hasAnyRole('ADMIN','WORKER')")
     @GetMapping("/{farmId}")
     public ResponseEntity<ApiResponse<Farm>> getById(@PathVariable Integer farmId) {
         Farm farm = farmService.getById(farmId);
@@ -23,6 +25,7 @@ public class FarmController {
         return ResponseEntity.ok(new ApiResponse<>(farm));
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/{farmId}")
     public ResponseEntity<ApiResponse<Farm>> update(
             @PathVariable Integer farmId,

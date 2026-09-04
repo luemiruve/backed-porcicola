@@ -8,6 +8,7 @@ import com.luemi.pehuame.model.Farm;
 import com.luemi.pehuame.model.User;
 import com.luemi.pehuame.repository.FarmRepository;
 import com.luemi.pehuame.repository.UserRepository;
+import com.luemi.pehuame.security.CurrentUser;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -31,6 +32,7 @@ public class UserService {
     private UserMapper userMapper;
 
     public List<UserDTO> listByFarm(Integer farmId) {
+        requireOwnFarm(farmId);
         return userRepository.findByFarmId(farmId)
                 .stream()
                 .map(userMapper::toDTO)
@@ -38,13 +40,13 @@ public class UserService {
     }
 
     public UserDTO getById(Integer userId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
-        return userMapper.toDTO(user);
+        return userMapper.toDTO(getOwnedUser(userId));
     }
 
     @Transactional
     public UserDTO createWorker(Integer farmId, RegisterWorkerRequest request) {
+        requireOwnFarm(farmId);
+
         if (userRepository.existsByEmail(request.getEmail())) {
             throw new RuntimeException("Email is already registered");
         }
@@ -66,8 +68,12 @@ public class UserService {
 
     @Transactional
     public UserDTO update(Integer userId, UserDTO dto) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+        User user = getOwnedUser(userId);
+        Integer callerId = CurrentUser.get().getId();
+        boolean isAdmin = CurrentUser.get().getRole() == UserRole.ADMIN;
+        if (!userId.equals(callerId) && !isAdmin) {
+            throw new RuntimeException("User not found");
+        }
 
         user.setName(dto.getName());
         user.setPhone(dto.getPhone());
@@ -76,9 +82,15 @@ public class UserService {
     }
 
     @Transactional
-    public void changePassword(Integer userId, String newPassword) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+    public void changePassword(Integer userId, String currentPassword, String newPassword) {
+        if (!userId.equals(CurrentUser.get().getId())) {
+            throw new RuntimeException("User not found");
+        }
+
+        User user = getOwnedUser(userId);
+        if (!passwordEncoder.matches(currentPassword, user.getPasswordHash())) {
+            throw new RuntimeException("Current password is incorrect");
+        }
 
         user.setPasswordHash(passwordEncoder.encode(newPassword));
         userRepository.save(user);
@@ -86,9 +98,26 @@ public class UserService {
 
     @Transactional
     public void deactivate(Integer userId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+        User user = getOwnedUser(userId);
+        if (CurrentUser.get().getRole() != UserRole.ADMIN) {
+            throw new RuntimeException("User not found");
+        }
         user.setActive(false);
         userRepository.save(user);
+    }
+
+    private User getOwnedUser(Integer userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        if (!user.getFarm().getId().equals(CurrentUser.get().getFarmId())) {
+            throw new RuntimeException("User not found");
+        }
+        return user;
+    }
+
+    private void requireOwnFarm(Integer farmId) {
+        if (!farmId.equals(CurrentUser.get().getFarmId())) {
+            throw new RuntimeException("Farm not found");
+        }
     }
 }
