@@ -9,7 +9,7 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.luemi</groupId>
-	<artifactId>porcicola</artifactId>
+	<artifactId>pehuame</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name/>
 	<description/>

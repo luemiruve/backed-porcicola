@@ -1,10 +1,10 @@
-# 🐷 Porcicola Backend
+# 🐷 Pehuame Backend
 
-API REST para gestión integral de una granja porcina. Repositorio de lógica del proyecto **Porcicola** — junto a `porcicola-database` (esquema y Postgres local) y `porcicola-frontend` (cliente móvil), como repos independientes dentro del mismo proyecto.
+API REST para gestión integral de una granja porcina. Repositorio de lógica del proyecto **Pehuame** — junto a `pehuame-database` (esquema y Postgres local) y `pehuame-frontend` (cliente móvil), como repos independientes dentro del mismo proyecto.
 
 ## 🚀 Stack
 - Java 21 + Spring Boot 3.5
-- PostgreSQL (Supabase en prod, Docker local en dev — ver el repo `porcicola-database`) · JPA / Hibernate (`ddl-auto=validate` — la BD es la fuente de verdad del esquema)
+- PostgreSQL (Supabase en prod, Docker local en dev — ver el repo `pehuame-database`) · JPA / Hibernate (`ddl-auto=validate` — la BD es la fuente de verdad del esquema)
 - JWT stateless (jjwt) + Spring Security (`@PreAuthorize` por rol)
 
 ## 🧠 Arquitectura
@@ -25,11 +25,11 @@ API REST para gestión integral de una granja porcina. Repositorio de lógica de
 - Contraseñas con `BCryptPasswordEncoder`
 
 ## ▶️ Correr localmente
-Contra Postgres en Docker (repo `porcicola-database`, clonado junto a este):
+Contra Postgres en Docker (repo `pehuame-database`, clonado junto a este):
 ```bash
-cd ../porcicola-database && docker compose up -d
-cd ../porcicola-backend && mvn spring-boot:run -Dspring-boot.run.profiles=local
+cd ../pehuame-database && docker compose up -d
+cd ../pehuame-backend && mvn spring-boot:run -Dspring-boot.run.profiles=local
 ```
-Asume `porcicola-database` clonado como carpeta hermana de esta (`../porcicola-database`) — ajusta la ruta si tu checkout local es distinto. El perfil `local` (`src/main/resources/application-local.properties`) trae credenciales de dev fijas, sin depender de `.env`.
+Asume `pehuame-database` clonado como carpeta hermana de esta (`../pehuame-database`) — ajusta la ruta si tu checkout local es distinto. El perfil `local` (`src/main/resources/application-local.properties`) trae credenciales de dev fijas, sin depender de `.env`.
 
 Contra Supabase (prod): requiere `.env` en esta carpeta con `DB_URL`, `DB_USERNAME`, `DB_PASSWORD`, `JWT_SECRET`, `JWT_EXPIRATION`, `SSUName`, `SSUPassword` — `mvn spring-boot:run` (sin profile).
